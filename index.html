@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Data Collection</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body{font-family:Inter,system-ui,Arial,sans-serif;margin:0;padding:24px;background:#f7f7fb;color:#111}
+    .card{max-width:640px;margin:0 auto;background:#fff;border-radius:16px;box-shadow:0 8px 30px rgba(0,0,0,.06);padding:24px}
+    h1{font-size:24px;margin:0 0 12px}
+    p.sub{color:#555;margin:0 0 24px}
+    label{display:block;font-weight:600;margin:16px 0 6px}
+    input{width:100%;padding:12px 14px;border:1px solid #ddd;border-radius:10px;font-size:14px}
+    button{margin-top:18px;padding:12px 16px;font-weight:600;border:0;border-radius:10px;cursor:pointer}
+    .btn{background:#111;color:#fff}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .note{font-size:12px;color:#666;margin-top:8px}
+    .ok{background:#e6ffed;border:1px solid #b2f5cb;color:#0a7d3b;padding:10px;border-radius:8px;display:none;margin-top:12px}
+    .err{background:#ffefef;border:1px solid #ffc9c9;color:#9b1c1c;padding:10px;border-radius:8px;display:none;margin-top:12px;white-space:pre-wrap}
+    .nav{max-width:640px;margin:16px auto;text-align:center}
+    .nav a{color:#111;text-decoration:none;font-weight:600}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Add a record</h1>
+    <p class="sub">Submits to Google Sheets via a tiny Apps Script endpoint.</p>
+    <form id="leadForm">
+      <label for="name">Name</label>
+      <input id="name" name="name" required placeholder="Jane Doe">
+      <div class="row">
+        <div>
+          <label for="email">Email</label>
+          <input id="email" type="email" name="email" required placeholder="jane@example.com">
+        </div>
+        <div>
+          <label for="phone">Phone</label>
+          <input id="phone" name="phone" placeholder="+91-...">
+        </div>
+      </div>
+      <label for="city">City</label>
+      <input id="city" name="city" placeholder="Guwahati">
+      <div class="note">Fields are just examples — edit freely.</div>
+      <button class="btn" type="submit">Submit</button>
+      <div id="ok" class="ok">Saved ✅</div>
+      <div id="err" class="err"></div>
+    </form>
+  </div>
+  <div class="nav">
+    <a href="display.html">→ View records</a>
+  </div>
+  <script src="assets/app.js"></script>
+  <script>
+    const form = document.getElementById('leadForm');
+    const ok = document.getElementById('ok');
+    const err = document.getElementById('err');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      ok.style.display = 'none'; err.style.display = 'none';
+      const data = Object.fromEntries(new FormData(form).entries());
+      try{
+        const res = await submitRow(data);
+        if(res.ok){
+          ok.style.display = 'block';
+          form.reset();
+        }else{
+          err.textContent = res.error || 'Unknown error';
+          err.style.display = 'block';
+        }
+      }catch(ex){
+        err.textContent = String(ex);
+        err.style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html>
